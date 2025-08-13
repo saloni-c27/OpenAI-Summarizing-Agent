@@ -1,0 +1,210 @@
+{
+  "name": "OpenAI Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2887dc8e-1716-4379-b0db-b1c08fc739d0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.anthropic.com/news/core-views-on-ai-safety",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d2596621-e31e-4e96-94d8-4db679ce3e97",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "cssSelector": "={{ $json.data }}",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "7e023749-dc51-4c28-9c24-1055e183574d",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Summarize the following into one paragraph with 4 main points: {{ $json[''][74] }}."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        0
+      ],
+      "id": "b5c0580f-5ac5-4438-bc10-354fd9c38dc8",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SS8hz7vUySzE2mCt",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appxOVIXcBEOUqfeA",
+          "mode": "list",
+          "cachedResultName": "OpenAI Agent",
+          "cachedResultUrl": "https://airtable.com/appxOVIXcBEOUqfeA"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcN2FRkCnEXc2tL",
+          "mode": "list",
+          "cachedResultName": "Summaries",
+          "cachedResultUrl": "https://airtable.com/appxOVIXcBEOUqfeA/tblcN2FRkCnEXc2tL"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.message.role }}",
+            "Notes": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        0
+      ],
+      "id": "2a056f5e-299c-4011-881c-7d557dc2f02c",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "4v7Mmx0ct4aoZZj1",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "003a033d-c321-404d-873c-d5f564ae3a55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87c7940c26d8c10ae57a7c3e858db0619d3ce13534d588caef972527243fddc6"
+  },
+  "id": "olWSnLalH5vHJcGH",
+  "tags": []
+}
